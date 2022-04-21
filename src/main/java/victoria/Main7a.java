@@ -4,10 +4,18 @@
  */
 package victoria;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -18,21 +26,24 @@ public class Main7a {
     public static void main(String[] args) {
         // Fichero a leer
         String idFichero = "RelPerCen.csv";
+        String idFichero2 = "profesoresPorDepartamento.csv";
         // Variables para guardar los datos que se van leyendo
         String[] tokens;
         String linea;
-        int contador= 0;
-        
+        String tmp;
+        int contadorProfes = 0;
+
         //creo lista donde guardare los datos
-        
         ArrayList<Pojo> lista = new ArrayList<>();
+        //declaro e inicializo el MAP que luego trataremos
+        Map<String,Integer> listaProfes = new HashMap();
 
         System.out.println("Leyendo el fichero: " + idFichero);
 
         // Inicialización del flujo "datosFichero" en función del archivo llamado "idFichero"
         // Estructura try-with-resources. Permite cerrar los recursos una vez finalizadas
         // las operaciones con el archivo
-        try ( Scanner datosFichero = new Scanner(new File(idFichero))) {
+        try (Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
             //salto linea 
             datosFichero.nextLine();
             // hasNextLine devuelve true mientras haya líneas por leer
@@ -42,23 +53,168 @@ public class Main7a {
                 // Se guarda en el array de String cada elemento de la
                 // línea en función del carácter separador coma
                 tokens = linea.split(",");
-                
+
                 //instancio objeto pojo donde guardarlo dentro
                 Pojo p1 = new Pojo();
-                
-                p1.setNombre(linea);
-                /*
-                https://es.stackoverflow.com/questions/454320/eliminar-comillas-de-un-string-java#:~:text=Prueba%20con%20estas%20dos%20sentencias,al%20inicio%20y%20al%20final.
-                */
-                
 
+                p1.setNombre(quitarComas(tokens[0] + tokens[1]));
+                p1.setDni(quitarComas(tokens[2]));
+                p1.setPuesto(quitarComas(tokens[3]));
+
+                /*FECHAS DE INICIO Y DE FIN*/
+                //FECHA INICIO. Con los datos de fecha hay  que tratarlos para convertirlos en el tipo que son
+                //guardo la posición del token en un string 
+                String fecha1 = (quitarComas(tokens[4]));
+                //y luego transformo a tipo localDate con .parse y cambio el formato con DateTimeFormatter
+                p1.setFecIni(LocalDate.parse(fecha1, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+                //FECHA FIN. Controlar si es null
+                String fecha2 = (quitarComas(tokens[5]));
+                int tamanio = fecha2.length();
+                if (tamanio > 0) {
+                    p1.setFecFin(LocalDate.parse(fecha2, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                } else {
+                    p1.setFecFin(LocalDate.now());
+
+                }
+
+                p1.setTelf(quitarComas(tokens[6]));
+
+                /*DATOS BOOLEANOS*/
+                //con equalsignorecase realizo el simil
+                if (quitarComas(tokens[7]).equalsIgnoreCase("SI")) {
+                    p1.setEvaluador(true);
+                } else {
+                    p1.setEvaluador(false);
+
+                }
+                if (quitarComas(tokens[8]).equalsIgnoreCase("SI")) {
+                    p1.setCoordinador(true);
+                } else {
+                    p1.setCoordinador(false);
+
+                }
+
+                //una vez acabado agrego todos los tokens a la lista
+                lista.add(p1);
+
+
+                /*
+                ccuando tengo una lista cojo departamento y num de profesores*/
             }
-            System.out.println();
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
 
+        //Llegamos aquí el fichero se lee según lo previsto.
+        //**********************************************************************
+        /**
+         * ENUNCIADO[Genera un map para almacenar cuantos profesores hay por
+         * cada departamento diferente. Vuelca esta información en otro fichero
+         * CSV, llamado "profesoresPorDepartamento.csv", separando los campos
+         * con un tabulador.]
+         **********************************************************************/
+         
+        listaProfes = sacarNumDeptos(lista);
+        
+   //ESCRIBO EL ARCHIVO QUE GUARDA EL MAPEO
+        // Si se utiliza el constructor FileWriter(idFichero, true) entonces se anexa información
+        // al final del fichero idFichero
+        // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
+        // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
+        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
+             flujo.write("Depto\t Numero");
+             flujo.newLine();
+             
+             //foreach que recorra en función de la clave primaria y su valor que son los profes
+             
+             for (String key: listaProfes.keySet()) {
+                 //lo que quiero escribir
+                flujo.write(key + " \t " + listaProfes.get(key) );
+                //siguiente linea
+                flujo.newLine();
+                
+            }
+           // Metodo fluh() guarda cambios en disco 
+            flujo.flush();
+            System.out.println("Fichero " + idFichero2 + " creado correctamente.");  
+         }catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        
+        //recorro el map y saco el númer 
+        int contadorProf = 0;
+        System.out.println("\n******************************************");
+        System.out.println("\n*********PROFESORES***********************");
+        for (Pojo p : lista) {
+            System.out.println(p.toString());
+            contadorProf++;
+        }
+        
+        System.out.println("Existen "+ contadorProf + " profesores");
+        
+        
+        
+        /**Guarda en otro fichero CSV los registros de aquellos empleados que 
+         * hayan trabajado más de 100 días en el curso 20/21. Ten en cuenta que 
+         * si la fecha de cese está vacía significa que el empleado está 
+         * en servicio activo.]
+         **********************************************************************/
+    
+        
+    
+    
+    
+    
+    
+    
     }
 
+    //método para quitar las comillas del string usando replace
+    private static String quitarComas(String texto) {
+        String resultado;
+        return resultado = texto.replace("\"", "");
+
+    }
+    //Fuente:https://parzibyte.me/blog/2018/08/21/remover-comillas-de-cadena-en-java/
+
+    //método quitar las comillas de un string usando substring
+    private static String takeoffComillasSubstring(String texto) {
+        String resultado;
+        return resultado = texto.substring(1, texto.length() - 1);
+
+    }
+    //Fuente:https://es.stackoverflow.com/questions/454320/eliminar-comillas-de-un-string-java#:~:text=Prueba%20con%20estas%20dos%20sentencias,al%20inicio%20y%20al%20final.
+    
+    
+    /*Método que devuelve un MAP donde cuenta el numeros de 
+    profesiones diferentes por asignatura
+    */
+    private static Map<String,Integer> sacarNumDeptos(ArrayList<Pojo> lista){
+    //declaro e inicializo el map
+    Map<String, Integer> listaDeptos = new TreeMap<>();
+    //mínimo cuando se encuentra un departamento es porque hay un profe
+    int contDepto = 1;
+    
+        for (Pojo p : lista) {
+            //si es igual que el puesto se suma el contador
+            if(listaDeptos.containsKey(p.getPuesto())){
+            contDepto++;
+            
+            }else{
+                //se queda igual
+                contDepto = 1;
+                listaDeptos.put(p.getPuesto(), contDepto);
+            
+            }
+        }
+    
+    return listaDeptos;
+    
+    
+    }
+    
+    
 }

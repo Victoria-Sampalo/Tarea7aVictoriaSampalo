@@ -99,7 +99,12 @@ public class Pojo {
 
     @Override
     public String toString() {
-        return "Pojo{" + "nombre=" + nombre + ", dni=" + dni + ", puesto=" + puesto + ", fecIni=" + fecIni + ", fecFin=" + fecFin + ", telf=" + telf + ", evaluador=" + evaluador + ", coordinador=" + coordinador + '}';
+        int contador= 0;
+        return "Profesor: "+ nombre + 
+                ", dni: " + dni + ", puesto: " + puesto + 
+                ", fecIni: " + fecIni + ", fecFin: " + fecFin + 
+                ", telf: " + telf + ", evaluador: " + evaluador +
+                ", coordinador: " + coordinador ;
     }
     
     
