@@ -11,14 +11,14 @@ import java.time.LocalDate;
  * @author victoria
  */
 public class Pojo {
+
     //encapsulo los atributos del cvs
     private String nombre, dni, puesto;
-    private LocalDate fecIni,fecFin;
-    private String telf; 
+    private LocalDate fecIni, fecFin;
+    private String telf;
     private boolean evaluador, coordinador;
-    
-    //constructor por defecto
 
+    //constructor por defecto
     public Pojo() {
     }
 
@@ -99,16 +99,22 @@ public class Pojo {
 
     @Override
     public String toString() {
-        int contador= 0;
-        return "Profesor: "+ nombre + 
-                ", dni: " + dni + ", puesto: " + puesto + 
-                ", fecIni: " + fecIni + ", fecFin: " + fecFin + 
-                ", telf: " + telf + ", evaluador: " + evaluador +
-                ", coordinador: " + coordinador ;
+
+        return "Profesor: " + nombre
+                + ", dni: " + dni + ", puesto: " + puesto
+                + ", fecIni: " + fecIni + ", fecFin: " + fecFin
+                + ", telf: " + telf + ", evaluador: " + evaluador
+                + ", coordinador: " + coordinador;
     }
     
     
-    
-    
-    
+    public String toStringProfesAntiguos() {
+
+        return   nombre
+                + "\t" + dni +"\t" + puesto
+                + "\t" + fecIni + "\t" + fecFin
+                + "\t" + telf + "\t" + evaluador
+                + "\t" + coordinador;
+    }
+
 }

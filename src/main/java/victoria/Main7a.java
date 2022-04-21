@@ -11,7 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,7 @@ public class Main7a {
         // Fichero a leer
         String idFichero = "RelPerCen.csv";
         String idFichero2 = "profesoresPorDepartamento.csv";
+        String idFichero3 = "profesoresAntiguos.csv";
         // Variables para guardar los datos que se van leyendo
         String[] tokens;
         String linea;
@@ -36,7 +39,7 @@ public class Main7a {
         //creo lista donde guardare los datos
         ArrayList<Pojo> lista = new ArrayList<>();
         //declaro e inicializo el MAP que luego trataremos
-        Map<String,Integer> listaProfes = new HashMap();
+        Map<String, Integer> listaProfes = new HashMap();
 
         System.out.println("Leyendo el fichero: " + idFichero);
 
@@ -114,36 +117,34 @@ public class Main7a {
          * cada departamento diferente. Vuelca esta información en otro fichero
          * CSV, llamado "profesoresPorDepartamento.csv", separando los campos
          * con un tabulador.]
-         **********************************************************************/
-         
+         * ********************************************************************
+         */
         listaProfes = sacarNumDeptos(lista);
-        
-   //ESCRIBO EL ARCHIVO QUE GUARDA EL MAPEO
+
+        //ESCRIBO EL ARCHIVO QUE GUARDA EL MAPEO
         // Si se utiliza el constructor FileWriter(idFichero, true) entonces se anexa información
         // al final del fichero idFichero
         // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
         // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
         try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
-             flujo.write("Depto\t Numero");
-             flujo.newLine();
-             
-             //foreach que recorra en función de la clave primaria y su valor que son los profes
-             
-             for (String key: listaProfes.keySet()) {
-                 //lo que quiero escribir
-                flujo.write(key + " \t " + listaProfes.get(key) );
+            flujo.write("Depto\t Numero");
+            flujo.newLine();
+
+            //foreach que recorra en función de la clave primaria y su valor que son los profes
+            for (String key : listaProfes.keySet()) {
+                //lo que quiero escribir
+                flujo.write(key + " \t " + listaProfes.get(key));
                 //siguiente linea
                 flujo.newLine();
-                
+
             }
-           // Metodo fluh() guarda cambios en disco 
+            // Metodo fluh() guarda cambios en disco 
             flujo.flush();
-            System.out.println("Fichero " + idFichero2 + " creado correctamente.");  
-         }catch (IOException e) {
+            System.out.println("Fichero " + idFichero2 + " creado correctamente.");
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        
-        
+
         //recorro el map y saco el númer 
         int contadorProf = 0;
         System.out.println("\n******************************************");
@@ -152,24 +153,48 @@ public class Main7a {
             System.out.println(p.toString());
             contadorProf++;
         }
-        
-        System.out.println("Existen "+ contadorProf + " profesores");
-        
-        
-        
-        /**Guarda en otro fichero CSV los registros de aquellos empleados que 
-         * hayan trabajado más de 100 días en el curso 20/21. Ten en cuenta que 
-         * si la fecha de cese está vacía significa que el empleado está 
-         * en servicio activo.]
-         **********************************************************************/
-    
-        
-    
-    
-    
-    
-    
-    
+
+        System.out.println("Existen " + contadorProf + " profesores");
+
+        /**
+         * Guarda en otro fichero CSV los registros de aquellos empleados que
+         * hayan trabajado más de 100 días en el curso 20/21. Ten en cuenta que
+         * si la fecha de cese está vacía significa que el empleado está en
+         * servicio activo.]
+         * ********************************************************************
+         */
+        //variables localdate a tener 
+        LocalDate fecha1 = LocalDate.of(2020, Month.JANUARY, 1);//inicio
+        LocalDate fecha2 = LocalDate.of(2021, Month.DECEMBER, 31);//fin
+
+        //usamos de nuevo BufferedWriter
+        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero3))) {
+            flujo.write("Nombre\tDNI\tPasaporte\tPuesto\tFechaInicio\tFechaFin\tTelefono"
+                    + "\tEvaluador\tCoordinador");
+            flujo.newLine();
+
+            for (Pojo profesor : lista) {
+                //if para comprobar si está entre la fecha de inicio y de fin
+                if (profesor.getFecIni().isAfter(fecha1)
+                        && profesor.getFecFin().isBefore(fecha2)) {
+
+                    if (diasEntreFechas(profesor.getFecIni(), profesor.getFecFin()) > 101) {
+                        //si cumple ambas lo escribo
+                        flujo.write(profesor.toStringProfesAntiguos());
+                        flujo.newLine();
+
+                    }
+
+                }
+            }
+            // Metodo fluh() guarda cambios en disco 
+            flujo.flush();
+            System.out.println("\n");
+            System.out.println("Fichero " + idFichero3 + " creado correctamente.");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     //método para quitar las comillas del string usando replace
@@ -187,34 +212,39 @@ public class Main7a {
 
     }
     //Fuente:https://es.stackoverflow.com/questions/454320/eliminar-comillas-de-un-string-java#:~:text=Prueba%20con%20estas%20dos%20sentencias,al%20inicio%20y%20al%20final.
-    
-    
+
     /*Método que devuelve un MAP donde cuenta el numeros de 
     profesiones diferentes por asignatura
-    */
-    private static Map<String,Integer> sacarNumDeptos(ArrayList<Pojo> lista){
-    //declaro e inicializo el map
-    Map<String, Integer> listaDeptos = new TreeMap<>();
-    //mínimo cuando se encuentra un departamento es porque hay un profe
-    int contDepto = 1;
-    
+     */
+    private static Map<String, Integer> sacarNumDeptos(ArrayList<Pojo> lista) {
+        //declaro e inicializo el map
+        Map<String, Integer> listaDeptos = new TreeMap<>();
+        //mínimo cuando se encuentra un departamento es porque hay un profe
+        int contDepto = 1;
+
         for (Pojo p : lista) {
             //si es igual que el puesto se suma el contador
-            if(listaDeptos.containsKey(p.getPuesto())){
-            contDepto++;
-            
-            }else{
+            if (listaDeptos.containsKey(p.getPuesto())) {
+                contDepto++;
+
+            } else {
                 //se queda igual
                 contDepto = 1;
                 listaDeptos.put(p.getPuesto(), contDepto);
-            
+
             }
         }
-    
-    return listaDeptos;
-    
-    
+
+        return listaDeptos;
+
     }
-    
-    
+
+    //método que calcula los días
+    public static long diasEntreFechas(LocalDate fecha1, LocalDate fecha2) {
+
+        long result = ChronoUnit.DAYS.between(fecha1, fecha2);
+        return result;
+
+    }
+
 }
