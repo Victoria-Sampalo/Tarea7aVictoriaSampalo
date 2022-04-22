@@ -5,6 +5,7 @@
 package victoria;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  *
@@ -116,5 +117,57 @@ public class Pojo {
                 + "\t" + telf + "\t" + evaluador
                 + "\t" + coordinador;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + Objects.hashCode(this.nombre);
+        hash = 43 * hash + Objects.hashCode(this.dni);
+        hash = 43 * hash + Objects.hashCode(this.puesto);
+        hash = 43 * hash + Objects.hashCode(this.fecIni);
+        hash = 43 * hash + Objects.hashCode(this.fecFin);
+        hash = 43 * hash + Objects.hashCode(this.telf);
+        hash = 43 * hash + (this.evaluador ? 1 : 0);
+        hash = 43 * hash + (this.coordinador ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pojo other = (Pojo) obj;
+        if (this.evaluador != other.evaluador) {
+            return false;
+        }
+        if (this.coordinador != other.coordinador) {
+            return false;
+        }
+        if (!Objects.equals(this.nombre, other.nombre)) {
+            return false;
+        }
+        if (!Objects.equals(this.dni, other.dni)) {
+            return false;
+        }
+        if (!Objects.equals(this.puesto, other.puesto)) {
+            return false;
+        }
+        if (!Objects.equals(this.telf, other.telf)) {
+            return false;
+        }
+        if (!Objects.equals(this.fecIni, other.fecIni)) {
+            return false;
+        }
+        return Objects.equals(this.fecFin, other.fecFin);
+    }
+    
+    
 
 }

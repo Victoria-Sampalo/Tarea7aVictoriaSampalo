@@ -40,13 +40,14 @@ public class Main7a {
         ArrayList<Pojo> lista = new ArrayList<>();
         //declaro e inicializo el MAP que luego trataremos
         Map<String, Integer> listaProfes = new HashMap();
+        Map<String, Integer> listaProfesOrden = new TreeMap();
 
         System.out.println("Leyendo el fichero: " + idFichero);
 
         // Inicialización del flujo "datosFichero" en función del archivo llamado "idFichero"
         // Estructura try-with-resources. Permite cerrar los recursos una vez finalizadas
         // las operaciones con el archivo
-        try (Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
+        try ( Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
             //salto linea 
             datosFichero.nextLine();
             // hasNextLine devuelve true mientras haya líneas por leer
@@ -101,9 +102,6 @@ public class Main7a {
                 //una vez acabado agrego todos los tokens a la lista
                 lista.add(p1);
 
-
-                /*
-                ccuando tengo una lista cojo departamento y num de profesores*/
             }
 
         } catch (FileNotFoundException e) {
@@ -119,21 +117,47 @@ public class Main7a {
          * con un tabulador.]
          * ********************************************************************
          */
-        listaProfes = sacarNumDeptos(lista);
+        //muestro la lista de profesores 
+        int contadorProf = 0;
+        System.out.println("\n******************************************");
+        System.out.println("\n*********PROFESORES***********************");
+        System.out.println(lista.size());
+        for (int i = 0; i < lista.size(); i++) {
+            System.out.println(lista.get(i));
+        }
+
+        //HOY
+        /*CONVIERTO LA LISTA A MAP
+         */
+        int contadorDepartamento = 1;
+        for (Pojo profesor : lista) {
+            if (listaProfes.containsKey(profesor.getPuesto())) {
+                contadorDepartamento++;
+                listaProfes.put(profesor.getPuesto(), contadorDepartamento);
+            } else {
+                contadorDepartamento = 1;
+                listaProfes.put(profesor.getPuesto(), contadorDepartamento);
+
+            }
+        }
+
+        //igualo el treeMap al hashMap
+        listaProfesOrden = listaProfes;
 
         //ESCRIBO EL ARCHIVO QUE GUARDA EL MAPEO
         // Si se utiliza el constructor FileWriter(idFichero, true) entonces se anexa información
         // al final del fichero idFichero
         // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
         // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
-        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
+        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
             flujo.write("Depto\t Numero");
             flujo.newLine();
 
             //foreach que recorra en función de la clave primaria y su valor que son los profes
-            for (String key : listaProfes.keySet()) {
+            for (String key : listaProfesOrden.keySet()) {
                 //lo que quiero escribir
-                flujo.write(key + " \t " + listaProfes.get(key));
+                flujo.write(key + " \t " + listaProfesOrden.get(key));
+
                 //siguiente linea
                 flujo.newLine();
 
@@ -144,17 +168,6 @@ public class Main7a {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
-        //recorro el map y saco el númer 
-        int contadorProf = 0;
-        System.out.println("\n******************************************");
-        System.out.println("\n*********PROFESORES***********************");
-        for (Pojo p : lista) {
-            System.out.println(p.toString());
-            contadorProf++;
-        }
-
-        System.out.println("Existen " + contadorProf + " profesores");
 
         /**
          * Guarda en otro fichero CSV los registros de aquellos empleados que
@@ -168,7 +181,7 @@ public class Main7a {
         LocalDate fecha2 = LocalDate.of(2021, Month.DECEMBER, 31);//fin
 
         //usamos de nuevo BufferedWriter
-        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero3))) {
+        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero3))) {
             flujo.write("Nombre\tDNI\tPasaporte\tPuesto\tFechaInicio\tFechaFin\tTelefono"
                     + "\tEvaluador\tCoordinador");
             flujo.newLine();
@@ -195,6 +208,25 @@ public class Main7a {
             System.out.println(e.getMessage());
         }
 
+        /**
+         * TERCERA PARTE PRÁCTICA 71
+         */
+        /*MÉTODO 1. SI UN EMPLEADO ESTÁ*/
+        boolean resultado = Utils.contieneEmpleados(lista, "Cristina");
+        System.out.println("Buscamos si Álvarez Chamizo, Cristina, ¿está? " + resultado);
+
+        resultado = Utils.contieneEmpleados(lista, "Victoria");
+        System.out.println("Probamos de nuevo si está Victoria, ¿está? " + resultado);
+
+        /*MÉTODO 2.*/
+        //indicar número de empleados y coordinadores.
+        int numProfes= Utils.numEmpleDeptos(lista, "Economía P.E.S.");
+        System.out.println("Buscamos por asignatura cuantos profesores existen en"
+                + "el departamento de Economía P.E.S.  "+ numProfes);
+        
+        
+        
+        /*MÉTODO 3*/
     }
 
     //método para quitar las comillas del string usando replace
@@ -215,10 +247,11 @@ public class Main7a {
 
     /*Método que devuelve un MAP donde cuenta el numeros de 
     profesiones diferentes por asignatura
+    NOTA_ NO SE USA PORQUE NO CONSIGO QUE ME ENTRE EN EL PROGRAMA.
      */
     private static Map<String, Integer> sacarNumDeptos(ArrayList<Pojo> lista) {
         //declaro e inicializo el map
-        Map<String, Integer> listaDeptos = new TreeMap<>();
+        Map<String, Integer> listaDeptos = new HashMap<>();
         //mínimo cuando se encuentra un departamento es porque hay un profe
         int contDepto = 1;
 
@@ -233,6 +266,7 @@ public class Main7a {
                 listaDeptos.put(p.getPuesto(), contDepto);
 
             }
+
         }
 
         return listaDeptos;
