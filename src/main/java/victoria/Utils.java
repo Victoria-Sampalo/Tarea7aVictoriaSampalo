@@ -4,7 +4,9 @@
  */
 package victoria;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -33,6 +35,7 @@ public class Utils {
         for (Pojo p : lista) {
             //accedemos con contains para mirar si esta o no el empleado.
             if (p.getNombre().contains(nombre)) {
+                //nota: se ha provado con .equalsIgnoreCase(nombre) y no funciona
                 contiene = true;
             }
         }
@@ -50,35 +53,52 @@ public class Utils {
 
         for (Pojo p : lista) {
             //si coincide con el nombre del depto que se sume
-            if (p.getPuesto().equalsIgnoreCase(depto)) {
+            if (p.getPuesto().equalsIgnoreCase(depto) && p.isCoordinador()) {
                 cont++;
 
             }
         }
         return cont;
     }
-    
-    
+
     /*MÉTODO 3
     A partir de una lista de empleados y una letra del NIF (char), obtener 
     una nueva lista ordenada alfabéticamente SOLO con los apellidos de los 
     empleados cuyo NIF contenga esa letra.
-    */
+     */
     //no sale el método
-//    public static ArrayList<String>listaNifOrdenada(ArrayList<Pojo> lista, char letra){
-//    //creo lista que vamos a devolver
-//     ArrayList<String> listaNIF = new ArrayList<>();
-//     
-//     //uso foreach para recorrer la lista ojo
-//        for (Pojo p : lista) {
-//            //con constains miro si tiene ese valor en la cadena con value
-//            if(p.getDni().contain())
-//        }
-//     
-//         
-//        return listaNIF;
-//    }
-    
-    
+    public static ArrayList<String> listaNifOrdenada(ArrayList<Pojo> lista, char letra) {
+        //creo lista que vamos a devolver
+        ArrayList<String> listaNIF = new ArrayList<>();
+
+        //uso foreach para recorrer la lista ojo
+        for (Pojo p : lista) {
+            //con constains miro si tiene ese valor en la cadena con value
+            if (p.getDni().charAt(p.getDni().length() - 1) == letra) {
+                listaNIF.add(p.getNombre() + ", dni " + p.getDni());
+            }
+        }
+
+        return listaNIF;
+    }
+
+    /*MÉTODO 4
+    A partir de una lista de empleados y una fecha, obtener una nueva lista con 
+    los NIF (ordenados de forma inversa) de todos los empleados cuya toma de 
+    posesión coincida con esa fecha.*/
+    public static ArrayList<String> listaNifFechaIni(ArrayList<Pojo> lista, LocalDate fecha) {
+        //creo lista que vamos a devolver
+        ArrayList<String> listaPosesion = new ArrayList<>();
+        for (Pojo p : lista) {
+            //recorro el array y si es la misma fecha lo añado a la lista
+            if (p.getFecIni().isEqual(fecha)) {
+                listaPosesion.add(p.getDni());
+
+            }
+        }
+        //ordenar de forma alfabética inversa
+        Collections.reverse(listaPosesion);
+        return listaPosesion;
+    }
 
 }

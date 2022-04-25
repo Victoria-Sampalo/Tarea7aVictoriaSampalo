@@ -47,7 +47,7 @@ public class Main7a {
         // Inicialización del flujo "datosFichero" en función del archivo llamado "idFichero"
         // Estructura try-with-resources. Permite cerrar los recursos una vez finalizadas
         // las operaciones con el archivo
-        try ( Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
+        try (Scanner datosFichero = new Scanner(new File(idFichero), "ISO-8859-1")) {
             //salto linea 
             datosFichero.nextLine();
             // hasNextLine devuelve true mientras haya líneas por leer
@@ -118,7 +118,6 @@ public class Main7a {
          * ********************************************************************
          */
         //muestro la lista de profesores 
-        int contadorProf = 0;
         System.out.println("\n******************************************");
         System.out.println("\n*********PROFESORES***********************");
         System.out.println(lista.size());
@@ -145,11 +144,7 @@ public class Main7a {
         listaProfesOrden = listaProfes;
 
         //ESCRIBO EL ARCHIVO QUE GUARDA EL MAPEO
-        // Si se utiliza el constructor FileWriter(idFichero, true) entonces se anexa información
-        // al final del fichero idFichero
-        // Estructura try-with-resources. Instancia el objeto con el fichero a escribir
-        // y se encarga de cerrar el recurso "flujo" una vez finalizadas las operaciones
-        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
+        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
             flujo.write("Depto\t Numero");
             flujo.newLine();
 
@@ -181,7 +176,7 @@ public class Main7a {
         LocalDate fecha2 = LocalDate.of(2021, Month.DECEMBER, 31);//fin
 
         //usamos de nuevo BufferedWriter
-        try ( BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero3))) {
+        try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero3))) {
             flujo.write("Nombre\tDNI\tPasaporte\tPuesto\tFechaInicio\tFechaFin\tTelefono"
                     + "\tEvaluador\tCoordinador");
             flujo.newLine();
@@ -209,9 +204,11 @@ public class Main7a {
         }
 
         /**
-         * TERCERA PARTE PRÁCTICA 71
+         * -------------------------------PRÁCTICA 71--------------------------
          */
+        System.out.println("\n**************PRÁCTICA 71.*********************");
         /*MÉTODO 1. SI UN EMPLEADO ESTÁ*/
+        System.out.println("MÉTODO 1. COMPROBAR SI EXISTE UN EMPLEADO POR EL NOMBRE");
         boolean resultado = Utils.contieneEmpleados(lista, "Cristina");
         System.out.println("Buscamos si Álvarez Chamizo, Cristina, ¿está? " + resultado);
 
@@ -220,13 +217,31 @@ public class Main7a {
 
         /*MÉTODO 2.*/
         //indicar número de empleados y coordinadores.
-        int numProfes= Utils.numEmpleDeptos(lista, "Economía P.E.S.");
+        //resultado esperado 19
+        System.out.println("\nMÉTODO 2. CONTAR NÚMERO DE COORDINADORES EN DEPARTAMENTOS");
+        int numProfes = Utils.numEmpleDeptos(lista, "Economía P.E.S.");
         System.out.println("Buscamos por asignatura cuantos profesores existen en"
-                + "el departamento de Economía P.E.S.  "+ numProfes);
-        
-        
-        
+                + "el departamento de Economía P.E.S.  " + numProfes);
+
         /*MÉTODO 3*/
+        System.out.println("\nMÉTODO 3.ORDENAR ALFABÉTICAMENTE EMPLEADOS EN FUNCIÓN DE LETRA 'A' DEL DNI");
+        //recorro y muestro lista 
+        for (String apel : Utils.listaNifOrdenada(lista, 'A')) {
+
+            System.out.println(apel);
+
+        }
+
+        /*MÉTODO 4*/
+        System.out.println("\nMÉTODO 4.EMPLEADOS CON FECHA DE INICIO");
+        //recorro la lista de nuevo y la muestro
+        System.out.println("Buscamos por la fecha 01/09/2006");
+        for (String dni : Utils.listaNifFechaIni(lista, LocalDate.of(2006, 9, 01))) {
+
+            System.out.println(dni);
+
+        }
+
     }
 
     //método para quitar las comillas del string usando replace
