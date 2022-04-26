@@ -37,7 +37,7 @@ public class Main7a {
         int contadorProfes = 0;
 
         //creo lista donde guardare los datos
-        ArrayList<Pojo> lista = new ArrayList<>();
+        ArrayList<Profesor> lista = new ArrayList<>();
         //declaro e inicializo el MAP que luego trataremos
         Map<String, Integer> listaProfes = new HashMap();
         Map<String, Integer> listaProfesOrden = new TreeMap();
@@ -53,13 +53,14 @@ public class Main7a {
             // hasNextLine devuelve true mientras haya líneas por leer
             while (datosFichero.hasNextLine()) {
                 linea = datosFichero.nextLine();
+                
 
                 // Se guarda en el array de String cada elemento de la
                 // línea en función del carácter separador coma
                 tokens = linea.split(",");
 
                 //instancio objeto pojo donde guardarlo dentro
-                Pojo p1 = new Pojo();
+                Profesor p1 = new Profesor();
 
                 p1.setNombre(quitarComas(tokens[0] + tokens[1]));
                 p1.setDni(quitarComas(tokens[2]));
@@ -69,6 +70,8 @@ public class Main7a {
                 //FECHA INICIO. Con los datos de fecha hay  que tratarlos para convertirlos en el tipo que son
                 //guardo la posición del token en un string 
                 String fecha1 = (quitarComas(tokens[4]));
+                
+                //PARA LOCALDATE PODEMOS CREAR MÉTODO PROPIO QUE HAGA ESO
                 //y luego transformo a tipo localDate con .parse y cambio el formato con DateTimeFormatter
                 p1.setFecIni(LocalDate.parse(fecha1, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
@@ -78,7 +81,8 @@ public class Main7a {
                 if (tamanio > 0) {
                     p1.setFecFin(LocalDate.parse(fecha2, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                 } else {
-                    p1.setFecFin(LocalDate.now());
+                        p1.setFecFin(LocalDate.now());
+//                    p1.setFecFin(null);
 
                 }
 
@@ -86,27 +90,40 @@ public class Main7a {
 
                 /*DATOS BOOLEANOS*/
                 //con equalsignorecase realizo el simil
-                if (quitarComas(tokens[7]).equalsIgnoreCase("SI")) {
-                    p1.setEvaluador(true);
-                } else {
+                if (quitarComas(tokens[7]).equalsIgnoreCase("NO")) {
                     p1.setEvaluador(false);
+                } else {
+                    p1.setEvaluador(true);
 
                 }
-                if (quitarComas(tokens[8]).equalsIgnoreCase("SI")) {
-                    p1.setCoordinador(true);
-                } else {
+                if (quitarComas(tokens[8]).equalsIgnoreCase("NO")) {
                     p1.setCoordinador(false);
+                } else {
+                    p1.setCoordinador(true);
 
                 }
 
                 //una vez acabado agrego todos los tokens a la lista
                 lista.add(p1);
+                 
 
             }
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
+        
+//         //Contador el cual nos dice los profesores totales que hay
+//        int contador = 0;
+//
+//        for (Profesor profesor : lista) {
+//            System.out.println(profesor.toString());
+//            contador++;
+//        }
+//
+//        System.out.println("\n\nHay un total de: " + contador + " profesores");
+       
+        
 
         //Llegamos aquí el fichero se lee según lo previsto.
         //**********************************************************************
@@ -129,7 +146,7 @@ public class Main7a {
         /*CONVIERTO LA LISTA A MAP
          */
         int contadorDepartamento = 1;
-        for (Pojo profesor : lista) {
+        for (Profesor profesor : lista) {
             if (listaProfes.containsKey(profesor.getPuesto())) {
                 contadorDepartamento++;
                 listaProfes.put(profesor.getPuesto(), contadorDepartamento);
@@ -145,13 +162,13 @@ public class Main7a {
 
         //ESCRIBO EL ARCHIVO QUE GUARDA EL MAPEO
         try (BufferedWriter flujo = new BufferedWriter(new FileWriter(idFichero2))) {
-            flujo.write("Depto\t Numero");
+            flujo.write("Depto\t\t    Numero");
             flujo.newLine();
 
             //foreach que recorra en función de la clave primaria y su valor que son los profes
             for (String key : listaProfesOrden.keySet()) {
                 //lo que quiero escribir
-                flujo.write(key + " \t " + listaProfesOrden.get(key));
+                flujo.write(key + " \t   " + listaProfesOrden.get(key));
 
                 //siguiente linea
                 flujo.newLine();
@@ -181,7 +198,7 @@ public class Main7a {
                     + "\tEvaluador\tCoordinador");
             flujo.newLine();
 
-            for (Pojo profesor : lista) {
+            for (Profesor profesor : lista) {
                 //if para comprobar si está entre la fecha de inicio y de fin
                 if (profesor.getFecIni().isAfter(fecha1)
                         && profesor.getFecFin().isBefore(fecha2)) {
@@ -264,13 +281,13 @@ public class Main7a {
     profesiones diferentes por asignatura
     NOTA_ NO SE USA PORQUE NO CONSIGO QUE ME ENTRE EN EL PROGRAMA.
      */
-    private static Map<String, Integer> sacarNumDeptos(ArrayList<Pojo> lista) {
+    private static Map<String, Integer> sacarNumDeptos(ArrayList<Profesor> lista) {
         //declaro e inicializo el map
         Map<String, Integer> listaDeptos = new HashMap<>();
         //mínimo cuando se encuentra un departamento es porque hay un profe
         int contDepto = 1;
 
-        for (Pojo p : lista) {
+        for (Profesor p : lista) {
             //si es igual que el puesto se suma el contador
             if (listaDeptos.containsKey(p.getPuesto())) {
                 contDepto++;

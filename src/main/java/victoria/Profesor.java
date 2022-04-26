@@ -11,19 +11,27 @@ import java.util.Objects;
  *
  * @author victoria
  */
-public class Pojo {
+public class Profesor {
+    //aquí volcaremos el fichero y meteremos en cada objeto
+    /*
+    *MEJORAS:
+    -mas modular
+    -metodo que haga los tokens, devuelve un objeto de tipo profe a partir de los tokens.
+        crear profesor y eso lo meto en la lista. 
+    */
 
     //encapsulo los atributos del cvs
     private String nombre, dni, puesto;
+    //recomendacion, podemos añadir apellido
     private LocalDate fecIni, fecFin;
     private String telf;
     private boolean evaluador, coordinador;
 
     //constructor por defecto
-    public Pojo() {
+    public Profesor() {
     }
 
-    public Pojo(String nombre, String dni, String puesto, LocalDate fecIni, LocalDate fecFin, String telf, boolean evaluador, boolean coordinador) {
+    public Profesor(String nombre, String dni, String puesto, LocalDate fecIni, LocalDate fecFin, String telf, boolean evaluador, boolean coordinador) {
         this.nombre = nombre;
         this.dni = dni;
         this.puesto = puesto;
@@ -143,7 +151,7 @@ public class Pojo {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Pojo other = (Pojo) obj;
+        final Profesor other = (Profesor) obj;
         if (this.evaluador != other.evaluador) {
             return false;
         }
